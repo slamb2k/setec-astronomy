@@ -32,22 +32,29 @@ Linux and WSL get a shared in-memory cache through `$XDG_RUNTIME_DIR`. On system
 ## Install
 
 ```sh
-git clone https://github.com/slamb2k/setec-astronomy.git
-cd setec-astronomy
-./install.sh
-```
-
-Or without cloning:
-
-```sh
 curl -fsSL https://raw.githubusercontent.com/slamb2k/setec-astronomy/main/install.sh | bash
 ```
 
+Everything comes from `main`, so there is nothing to clone and no way for a local
+working tree to end up installed. Re-run the same line to update.
+
 The installer:
 
-- copies `setec-astronomy.zsh` to `~/.local/share/setec-astronomy/`;
+- downloads `setec-astronomy.zsh` to `~/.local/share/setec-astronomy/`;
 - creates your list at `~/.config/setec-astronomy/keeper-secrets.list`, never overwriting an existing one;
 - adds a marked loader block to your `.zshrc`, honouring `ZDOTDIR`.
+
+If you'd rather read the script before running it, download it first and run it
+from anywhere:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/slamb2k/setec-astronomy/main/install.sh -o /tmp/install.sh
+less /tmp/install.sh
+bash /tmp/install.sh
+```
+
+That is a review step, not an offline install: whatever path you run it from, the
+installer still fetches its files from `main`.
 
 It refuses to install if another copy of these commands is already loaded, because two copies would run two refreshers against one Keeper login. Running it again updates the script in place.
 
@@ -131,7 +138,7 @@ secrets-refresh
 ## Uninstall
 
 ```sh
-./install.sh --uninstall
+curl -fsSL https://raw.githubusercontent.com/slamb2k/setec-astronomy/main/install.sh | bash -s -- --uninstall
 ```
 
 This removes the script and the loader block. Your list file and your Keeper records are left alone.

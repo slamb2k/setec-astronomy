@@ -1,16 +1,15 @@
 #!/usr/bin/env bash
 # SETEC ASTRONOMY installer: Keeper-backed environment variables for zsh.
 #
-#   ./install.sh              install or update, taking the files from beside this script if cloned
-#   ./install.sh --remote     install or update from GitHub, ignoring any files beside this script
+#   ./install.sh              install or update from GitHub
 #   ./install.sh --uninstall  remove the script and the .zshrc hook (keeps your list)
 #
-# Or without cloning:
+# There is nothing to clone: both files come from main, so a working tree (or a
+# half-edited one) can never end up installed.
 #   curl -fsSL https://raw.githubusercontent.com/slamb2k/setec-astronomy/main/install.sh | bash
 set -euo pipefail
 
 REPO_RAW="https://raw.githubusercontent.com/slamb2k/setec-astronomy/main"
-REMOTE=0  # --remote: always download, so a working tree can't leak into an install
 DATA_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/setec-astronomy"
 CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/setec-astronomy"
 SCRIPT="$DATA_DIR/setec-astronomy.zsh"
@@ -39,17 +38,10 @@ command -v zsh >/dev/null || die "zsh is required."
 ZDOT="$(zsh -c 'printf %s "${ZDOTDIR:-$HOME}"')"
 ZSHRC="$ZDOT/.zshrc"
 
-# Copies a repo file to $2: from beside this script when cloned, otherwise from GitHub.
-# --remote skips the clone, so a half-finished working tree can never be installed.
+# Downloads a repo file from main to $2.
 fetch() {
-  local here
-  here="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" 2>/dev/null && pwd || true)"
-  if (( ! REMOTE )) && [[ -n $here && -f "$here/$1" ]]; then
-    cp "$here/$1" "$2"
-  else
-    command -v curl >/dev/null || die "curl is required to download $1."
-    curl -fsSL "$REPO_RAW/$1" -o "$2" || die "couldn't download $REPO_RAW/$1"
-  fi
+  command -v curl >/dev/null || die "curl is required to download $1."
+  curl -fsSL "$REPO_RAW/$1" -o "$2" || die "couldn't download $REPO_RAW/$1"
 }
 
 remove_hook() {
@@ -65,8 +57,7 @@ UNINSTALL=0
 for arg in "$@"; do
   case $arg in
     --uninstall) UNINSTALL=1 ;;
-    --remote)    REMOTE=1 ;;
-    *) die "usage: install.sh [--uninstall] [--remote]" ;;
+    *) die "usage: install.sh [--uninstall]" ;;
   esac
 done
 
