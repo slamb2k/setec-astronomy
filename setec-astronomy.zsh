@@ -273,7 +273,12 @@ _keeper_secrets_needs_refresh() {
 _keeper_secrets_bg_refresh() {
   _keeper_secrets_have_cli || return 0
   (
-    zsystem flock -t 0 -f lockfd "$_keeper_secrets_dir/lock" 2>/dev/null || exit 0
+    if ! zsystem flock -t 0 -f lockfd "$_keeper_secrets_dir/lock" 2>/dev/null; then
+      # Either another shell is refreshing, or a stopped one is squatting on the
+      # lock. Clear a stopped holder and retry; a live holder is left alone.
+      _keeper_secrets_reclaim_lock || exit 0
+      zsystem flock -t 5 -f lockfd "$_keeper_secrets_dir/lock" 2>/dev/null || exit 0
+    fi
     _keeper_secrets_needs_refresh || exit 0  # another shell refreshed while we waited
     : >| "$_keeper_secrets_dir/attempt"
     local -A st
@@ -326,6 +331,43 @@ _keeper_secrets_precmd() {
   _keeper_secrets_needs_refresh && _keeper_secrets_bg_refresh
 }
 
+# Pids holding the cache lock: lsof when available, else /proc (Linux). Prints one
+# pid per line, and nothing at all when it can't tell.
+_keeper_secrets_lock_holders() {
+  local lock=$_keeper_secrets_dir/lock pid fd
+  if (( $+commands[lsof] )); then
+    lsof -t -- "$lock" 2>/dev/null
+    return
+  fi
+  for pid in /proc/<->(N); do
+    for fd in /proc/${pid:t}/fd/*(N); do
+      if [[ "$(readlink "$fd" 2>/dev/null)" == "$lock" ]]; then
+        print -r -- ${pid:t}
+        break
+      fi
+    done
+  done
+}
+
+# A holder stopped in state T is not running keeper and will never release the
+# lock by itself: only its death frees the flock. Testing for T is also what makes
+# the reclaim below safe, since a live waiter is never stopped and can't shoot
+# itself.
+_keeper_secrets_stuck_holder() {
+  [[ $(ps -o stat= -p "$1" 2>/dev/null) == T* ]]
+}
+
+# Kills any stopped lock holder so the kernel drops its flock. Returns 0 if it
+# killed something (the caller then retries flock).
+_keeper_secrets_reclaim_lock() {
+  local pid killed=0
+  for pid in ${(f)"$(_keeper_secrets_lock_holders)"}; do
+    _keeper_secrets_stuck_holder $pid || continue
+    kill -9 $pid 2>/dev/null && killed=1
+  done
+  (( killed ))
+}
+
 # Waits for the cache lock (so two keeper processes never overlap) and sets
 # REPLY to its fd. Without a cache there is nothing to lock.
 _keeper_secrets_lock() {
@@ -333,8 +375,12 @@ _keeper_secrets_lock() {
   REPLY=
   _keeper_secrets_cache_ready || return 0
   if ! zsystem flock -t 45 -f lockfd "$_keeper_secrets_dir/lock"; then
-    echo "Timed out waiting for another Keeper refresh to finish." >&2
-    return 1
+    # A stopped refresh holder holds the lock until it is killed, so waiting the
+    # full 45s again is pointless: clear it and retry once.
+    if ! _keeper_secrets_reclaim_lock || ! zsystem flock -t 5 -f lockfd "$_keeper_secrets_dir/lock"; then
+      echo "Timed out waiting for another Keeper refresh to finish." >&2
+      return 1
+    fi
   fi
   REPLY=$lockfd
 }
