@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # SETEC ASTRONOMY installer: Keeper-backed environment variables for zsh.
 #
-#   ./install.sh              install or update
+#   ./install.sh              install or update, taking the files from beside this script if cloned
+#   ./install.sh --remote     install or update from GitHub, ignoring any files beside this script
 #   ./install.sh --uninstall  remove the script and the .zshrc hook (keeps your list)
 #
 # Or without cloning:
@@ -9,6 +10,7 @@
 set -euo pipefail
 
 REPO_RAW="https://raw.githubusercontent.com/slamb2k/setec-astronomy/main"
+REMOTE=0  # --remote: always download, so a working tree can't leak into an install
 DATA_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/setec-astronomy"
 CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/setec-astronomy"
 SCRIPT="$DATA_DIR/setec-astronomy.zsh"
@@ -38,10 +40,11 @@ ZDOT="$(zsh -c 'printf %s "${ZDOTDIR:-$HOME}"')"
 ZSHRC="$ZDOT/.zshrc"
 
 # Copies a repo file to $2: from beside this script when cloned, otherwise from GitHub.
+# --remote skips the clone, so a half-finished working tree can never be installed.
 fetch() {
   local here
   here="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" 2>/dev/null && pwd || true)"
-  if [[ -n $here && -f "$here/$1" ]]; then
+  if (( ! REMOTE )) && [[ -n $here && -f "$here/$1" ]]; then
     cp "$here/$1" "$2"
   else
     command -v curl >/dev/null || die "curl is required to download $1."
@@ -58,7 +61,16 @@ remove_hook() {
   rm -f "$tmp"
 }
 
-if [[ ${1:-} == --uninstall ]]; then
+UNINSTALL=0
+for arg in "$@"; do
+  case $arg in
+    --uninstall) UNINSTALL=1 ;;
+    --remote)    REMOTE=1 ;;
+    *) die "usage: install.sh [--uninstall] [--remote]" ;;
+  esac
+done
+
+if (( UNINSTALL )); then
   banner "Uninstalling"
   remove_hook
   rm -f "$SCRIPT"
@@ -67,7 +79,6 @@ if [[ ${1:-} == --uninstall ]]; then
   say "Kept your list at $LIST and your Keeper records. Open a new shell to finish."
   exit 0
 fi
-[[ $# -eq 0 ]] || die "usage: install.sh [--uninstall]"
 
 banner "Installing"
 
