@@ -128,7 +128,7 @@ _keeper_secrets_cache_ready() {
 # Every user-facing command opens with this banner and the action it's taking, on
 # stderr so pipes and captured output stay clean.
 typeset -g _keeper_secrets_art='░█▀▀░█▀▀░▀█▀░█▀▀░█▀▀░░░█▀█░█▀▀░▀█▀░█▀▄░█▀█░█▀█░█▀█░█▄█░█░█
-░▀▀█░█▀▀░░█░░█▀▀░▀▀█░░░█▀█░▀▀█░░█░░█▀▄░█░█░█░█░█░█░█░█░░█░
+░▀▀█░█▀▀░░█░░█▀▀░█░░░░░█▀█░▀▀█░░█░░█▀▄░█░█░█░█░█░█░█░█░░█░
 ░▀▀▀░▀▀▀░░▀░░▀▀▀░▀▀▀░░░▀░▀░▀▀▀░░▀░░▀░▀░▀▀▀░▀░▀░▀▀▀░▀░▀░░▀░'
 _keeper_secrets_banner() {
   if [[ -t 2 ]]; then
