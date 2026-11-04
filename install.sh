@@ -1,20 +1,20 @@
 #!/usr/bin/env bash
-# CETEC ASTRONOMY installer: Keeper-backed environment variables for zsh.
+# SETEC ASTRONOMY installer: Keeper-backed environment variables for zsh.
 #
 #   ./install.sh              install or update
 #   ./install.sh --uninstall  remove the script and the .zshrc hook (keeps your list)
 #
 # Or without cloning:
-#   curl -fsSL https://raw.githubusercontent.com/slamb2k/cetec-astronomy/main/install.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/slamb2k/setec-astronomy/main/install.sh | bash
 set -euo pipefail
 
-REPO_RAW="https://raw.githubusercontent.com/slamb2k/cetec-astronomy/main"
-DATA_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/cetec-astronomy"
-CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/cetec-astronomy"
-SCRIPT="$DATA_DIR/cetec-astronomy.zsh"
+REPO_RAW="https://raw.githubusercontent.com/slamb2k/setec-astronomy/main"
+DATA_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/setec-astronomy"
+CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/setec-astronomy"
+SCRIPT="$DATA_DIR/setec-astronomy.zsh"
 LIST="$CONFIG_DIR/keeper-secrets.list"
-BEGIN="# >>> cetec-astronomy >>>"
-END="# <<< cetec-astronomy <<<"
+BEGIN="# >>> setec-astronomy >>>"
+END="# <<< setec-astronomy <<<"
 
 say() { printf '%s\n' "$*"; }
 warn() { printf 'warning: %s\n' "$*" >&2; }
@@ -84,7 +84,7 @@ for tool in keeper jq timeout; do command -v "$tool" >/dev/null || missing+=("$t
 command -v setsid >/dev/null || warn "setsid not found: background refreshes still work, but an expired Keeper login can't be detected as cleanly."
 
 mkdir -p "$DATA_DIR" "$CONFIG_DIR"
-fetch cetec-astronomy.zsh "$SCRIPT.tmp"
+fetch setec-astronomy.zsh "$SCRIPT.tmp"
 mv -f "$SCRIPT.tmp" "$SCRIPT"
 say "Installed $SCRIPT"
 

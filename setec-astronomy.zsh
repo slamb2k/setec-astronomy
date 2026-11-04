@@ -1,8 +1,8 @@
-# CETEC ASTRONOMY: Keeper-backed environment variables for zsh.
-# https://github.com/slamb2k/cetec-astronomy
+# SETEC ASTRONOMY: Keeper-backed environment variables for zsh.
+# https://github.com/slamb2k/setec-astronomy
 #
 # Secret values never live in dotfiles. The managed names are listed in
-# ~/.config/cetec-astronomy/keeper-secrets.list (override with KEEPER_SECRETS_LIST);
+# ~/.config/setec-astronomy/keeper-secrets.list (override with KEEPER_SECRETS_LIST);
 # each is fetched from the Keeper record titled env:global:<NAME>.
 # Needs Keeper Commander, jq, and Keeper persistent login.
 #
@@ -26,7 +26,7 @@ zmodload -F zsh/stat b:zstat
 
 typeset -g KEEPER_SECRETS_TTL=${KEEPER_SECRETS_TTL:-3600}     # refresh the cache after this many seconds
 typeset -g KEEPER_SECRETS_RETRY=${KEEPER_SECRETS_RETRY:-300}  # wait this long after a failed refresh
-typeset -g _keeper_secrets_list=${KEEPER_SECRETS_LIST:-${XDG_CONFIG_HOME:-$HOME/.config}/cetec-astronomy/keeper-secrets.list}
+typeset -g _keeper_secrets_list=${KEEPER_SECRETS_LIST:-${XDG_CONFIG_HOME:-$HOME/.config}/setec-astronomy/keeper-secrets.list}
 typeset -g _keeper_secrets_dir=${XDG_RUNTIME_DIR:+${XDG_RUNTIME_DIR%/}/keeper-secrets}
 typeset -g _keeper_secrets_log=${_keeper_secrets_dir:+$_keeper_secrets_dir/refresh.log}
 typeset -g _keeper_secrets_loaded= _keeper_secrets_warned= _keeper_secrets_list_sig= _keeper_secrets_unlisted_sig=

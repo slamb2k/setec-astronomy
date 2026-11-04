@@ -1,4 +1,4 @@
-# cetec-astronomy
+# setec-astronomy
 
 ```
 ░█▀▀░█▀▀░▀█▀░█▀▀░█▀▀░░░█▀█░█▀▀░▀█▀░█▀▄░█▀█░█▀█░█▀█░█▄█░█░█
@@ -17,7 +17,7 @@ Checking Keeper for env:global:OPENAI_API_KEY…
 Value for OPENAI_API_KEY (input hidden):
 Saving env:global:OPENAI_API_KEY to Keeper…
 Created Keeper record env:global:OPENAI_API_KEY.
-Added OPENAI_API_KEY to ~/.config/cetec-astronomy/keeper-secrets.list (other shells load it at their next prompt).
+Added OPENAI_API_KEY to ~/.config/setec-astronomy/keeper-secrets.list (other shells load it at their next prompt).
 ```
 
 ## Requirements
@@ -32,21 +32,21 @@ Linux and WSL get a shared in-memory cache through `$XDG_RUNTIME_DIR`. On system
 ## Install
 
 ```sh
-git clone https://github.com/slamb2k/cetec-astronomy.git
-cd cetec-astronomy
+git clone https://github.com/slamb2k/setec-astronomy.git
+cd setec-astronomy
 ./install.sh
 ```
 
 Or without cloning:
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/slamb2k/cetec-astronomy/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/slamb2k/setec-astronomy/main/install.sh | bash
 ```
 
 The installer:
 
-- copies `cetec-astronomy.zsh` to `~/.local/share/cetec-astronomy/`;
-- creates your list at `~/.config/cetec-astronomy/keeper-secrets.list`, never overwriting an existing one;
+- copies `setec-astronomy.zsh` to `~/.local/share/setec-astronomy/`;
+- creates your list at `~/.config/setec-astronomy/keeper-secrets.list`, never overwriting an existing one;
 - adds a marked loader block to your `.zshrc`, honouring `ZDOTDIR`.
 
 It refuses to install if another copy of these commands is already loaded, because two copies would run two refreshers against one Keeper login. Running it again updates the script in place.
@@ -76,7 +76,7 @@ Filters are case-insensitive substrings matched against names and tags, so `secr
 
 ## The list file
 
-`~/.config/cetec-astronomy/keeper-secrets.list` holds names, never values:
+`~/.config/setec-astronomy/keeper-secrets.list` holds names, never values:
 
 ```
 # VAR_NAME              optional search tags
@@ -108,7 +108,7 @@ Set these before the loader block in your `.zshrc`:
 
 | Variable | Default | Meaning |
 |---|---|---|
-| `KEEPER_SECRETS_LIST` | `~/.config/cetec-astronomy/keeper-secrets.list` | Where the list lives |
+| `KEEPER_SECRETS_LIST` | `~/.config/setec-astronomy/keeper-secrets.list` | Where the list lives |
 | `KEEPER_SECRETS_TTL` | `3600` | Refresh the cache after this many seconds |
 | `KEEPER_SECRETS_RETRY` | `300` | Wait this long before retrying a failed refresh |
 | `KEEPER_SECRETS_DISABLED` | unset | If set, don't load or refresh secrets in this shell |
